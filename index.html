@@ -13,18 +13,145 @@ section{padding:20px}.grid{display:grid;grid-template-columns:repeat(auto-fit,mi
 <input id='img' type='file' accept='image/*'>
 <button class='btn' onclick='addProduct()'>Add Product</button></section>
 <script>
-let products=JSON.parse(localStorage.getItem('anasProducts')||'[]');
-if(products.length==0){products=[{name:'Blue Jeans',price:'3999',desc:'Premium Denim',img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=700&q=80'}];save();}
-function save(){localStorage.setItem('anasProducts',JSON.stringify(products));render();}
-function render(){let p=document.getElementById('products');p.innerHTML='';products.forEach((x,i)=>p.innerHTML+=`<div class='card'><img src="${x.img}"><h3>${x.name}</h3><p>Rs. ${x.price}</p><p>${x.desc}</p><button class='btn' onclick='del(${i})'>Delete</button></div>`)}
-function del(i){products.splice(i,1);save();}
-function login(){let p=prompt('Enter Admin Password');if(p==='javeria'){document.getElementById('admin').style.display='block';alert('Welcome Admin');}else if(p)alert('Wrong Password');}
-function addProduct(){
-let f=document.getElementById('img').files[0];
-if(!f){alert('Choose image');return;}
-let r=new FileReader();
-r.onload=e=>{products.push({name:name.value,price:price.value,desc:desc.value,img:e.target.result});save();name.value=price.value=desc.value='';img.value='';}
-r.readAsDataURL(f);
+<script>
+let isAdmin = false;
+
+let products = JSON.parse(localStorage.getItem("anasProducts") || "[]");
+
+if(products.length===0){
+products=[
+{
+name:"Blue Jeans",
+price:"3999",
+desc:"Premium Denim",
+img:"https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=700&q=80"
 }
+];
+save();
+}
+
+function save(){
+localStorage.setItem("anasProducts",JSON.stringify(products));
 render();
-</script></body></html>
+}
+
+function render(){
+
+const container=document.getElementById("products");
+container.innerHTML="";
+
+products.forEach((p,index)=>{
+
+container.innerHTML+=`
+<div class="card">
+
+<img src="${p.img}" alt="${p.name}">
+
+<h3>${p.name}</h3>
+
+<p><b>Rs. ${p.price}</b></p>
+
+<p>${p.desc}</p>
+
+${isAdmin ? `<button class="btn" onclick="del(${index})">Delete</button>` : ""}
+
+</div>
+`;
+
+});
+
+}
+
+function del(i){
+
+if(confirm("Delete this product?")){
+products.splice(i,1);
+save();
+}
+
+}
+
+function login(){
+
+let pass=prompt("Enter Admin Password");
+
+if(pass==="javeria"){
+
+isAdmin=true;
+
+document.getElementById("admin").style.display="block";
+
+render();
+
+alert("Welcome Admin");
+
+}else if(pass){
+
+alert("Wrong Password");
+
+}
+
+}
+
+function addProduct(){
+
+const productName=document.getElementById("name").value.trim();
+
+const productPrice=document.getElementById("price").value.trim();
+
+const productDesc=document.getElementById("desc").value.trim();
+
+const image=document.getElementById("img");
+
+if(productName===""||productPrice===""||productDesc===""){
+
+alert("Please fill all fields.");
+
+return;
+
+}
+
+if(image.files.length===0){
+
+alert("Please choose an image.");
+
+return;
+
+}
+
+const reader=new FileReader();
+
+reader.onload=function(e){
+
+products.push({
+
+name:productName,
+
+price:productPrice,
+
+desc:productDesc,
+
+img:e.target.result
+
+});
+
+save();
+
+document.getElementById("name").value="";
+
+document.getElementById("price").value="";
+
+document.getElementById("desc").value="";
+
+image.value="";
+
+alert("Product Added Successfully!");
+
+};
+
+reader.readAsDataURL(image.files[0]);
+
+}
+
+render();
+</script>
